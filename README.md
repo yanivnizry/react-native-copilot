@@ -184,6 +184,28 @@ class HomeScreen {
   }
 }
 ```
+### Add onPress handler for masked component
+If you want the user to be able to interact with app while stepping through the tutorial, You can add onPress event to to one of Step components.
+ 
+```js
+import { walkthroughable, CopilotStep } from '@okgrow/react-native-copilot';
+
+const CopilotTouchableOpacity = walkthroughable(TouchableOpacity);
+
+class HomeScreen {
+  render() {
+    return (
+      <View>
+        <CopilotStep text="This is a touchable hello world example!" order={1} name="hello">
+          <CopilotTouchableOpacity
+            onPress={this.doSomething}
+          >Hello world!</CopilotTouchableOpacity>
+        </CopilotStep>
+      </View>
+    );
+  }
+}
+```
 
 ### Adjust vertical position
 In order to adjust vertical position pass `verticalOffset` to the `copilot` HOC.
