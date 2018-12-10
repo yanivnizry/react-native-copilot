@@ -7,7 +7,7 @@
   "scripts": {
     "lint": "eslint src/",
     "test": "jest src/",
-    "update": "git pull upstream master"
+    "update": "git remote update"
   },
   "repository": {
     "type": "git",

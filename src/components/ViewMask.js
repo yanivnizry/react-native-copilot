@@ -1,10 +1,15 @@
 // @flow
 import React, { Component } from 'react';
 
-import { View, Animated } from 'react-native';
+import { View, Animated, I18nManager } from 'react-native';
 import styles from './style';
 
 import type { valueXY } from '../types';
+
+
+const rtl = I18nManager.isRTL;
+const start = rtl ? 'right' : 'left';
+const end = rtl ? 'left' : 'right';
 
 type Props = {
   size: valueXY,
@@ -81,6 +86,7 @@ class ViewMask extends Component<Props, State> {
             {
               right: leftOverlayRight,
               backgroundColor: this.props.backdropColor,
+              [end]: leftOverlayRight,
             }]}
         />
         <Animated.View
@@ -89,6 +95,7 @@ class ViewMask extends Component<Props, State> {
             {
               left: rightOverlayLeft,
               backgroundColor: this.props.backdropColor,
+              [start]: rightOverlayLeft,
             }]}
         />
         <Animated.View
@@ -99,6 +106,8 @@ class ViewMask extends Component<Props, State> {
               left: verticalOverlayLeftBoundary,
               right: verticalOverlayRightBoundary,
               backgroundColor: this.props.backdropColor,
+              [start]: verticalOverlayLeftBoundary,
+              [end]: verticalOverlayRightBoundary,
             },
           ]}
         />
@@ -110,6 +119,8 @@ class ViewMask extends Component<Props, State> {
               left: verticalOverlayLeftBoundary,
               right: verticalOverlayRightBoundary,
               backgroundColor: this.props.backdropColor,
+              [start]: verticalOverlayLeftBoundary,
+              [end]: verticalOverlayRightBoundary,
             },
           ]}
         />
