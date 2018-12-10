@@ -112,6 +112,8 @@ class CopilotModal extends Component<Props, State> {
 
   async _animateMove(obj = {}): void {
     const layout = await this.measure();
+    obj.left = obj.left % Dimensions.get('window').width
+    obj.top = obj.top % Dimensions.get('window').height
     if (!this.props.androidStatusBarVisible && Platform.OS === 'android') {
       obj.top -= StatusBar.currentHeight; // eslint-disable-line no-param-reassign
     }
