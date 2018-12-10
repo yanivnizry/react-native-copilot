@@ -6,7 +6,8 @@
   "private": false,
   "scripts": {
     "lint": "eslint src/",
-    "test": "jest src/"
+    "test": "jest src/",
+    "update": "git pull upstream master"
   },
   "repository": {
     "type": "git",
