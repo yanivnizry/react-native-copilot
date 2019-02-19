@@ -5,12 +5,12 @@ import renderer from 'react-test-renderer';
 import { copilot, walkthroughable, CopilotStep } from '../index';
 import CopilotModal from '../components/CopilotModal';
 import ViewMask from '../components/ViewMask';
-import SvgMask from '../components/SvgMask';
+// import SvgMask from '../components/SvgMask';
 
 const WalkthroughableView = walkthroughable(View);
 
 type SampleComponentProps = {
-  secondStepActive?: boolean
+  secondStepActive?: boolean,
 };
 
 const SampleComponent = ({ secondStepActive }: SampleComponentProps) => (
@@ -64,18 +64,18 @@ it('renders <ViewMask /> when the overlay is `view`', async () => {
   expect(maskComponent).toBeDefined();
 });
 
-it('renders <SvgMask /> when the overlay is `svg`', async () => {
-  const CopilotComponent = copilot({
-    overlay: 'svg',
-  })(SampleComponent);
+// it('renders <SvgMask /> when the overlay is `svg`', async () => {
+//   const CopilotComponent = copilot({
+//     overlay: 'svg',
+//   })(SampleComponent);
 
-  const tree = renderer.create(<CopilotComponent />);
-  await tree.root.findByType(SampleComponent).props.start();
+//   const tree = renderer.create(<CopilotComponent />);
+//   await tree.root.findByType(SampleComponent).props.start();
 
-  const maskComponent = tree.root.findByType(SvgMask);
+//   const maskComponent = tree.root.findByType(SvgMask);
 
-  expect(maskComponent).toBeDefined();
-});
+//   expect(maskComponent).toBeDefined();
+// });
 
 it('updates the tooltip text when navigating through the steps', async () => {
   const CopilotComponent = copilot()(SampleComponent);
@@ -120,9 +120,7 @@ it('hides the tutorial tooltip once the tutorial is finished', async () => {
 });
 
 it('shows the custom tooltip component if specified', async () => {
-  const TooltipComponent = () => (
-    <View />
-  );
+  const TooltipComponent = () => <View />;
 
   const CopilotComponent = copilot({
     tooltipComponent: TooltipComponent,

@@ -1,18 +1,12 @@
 // @flow
 import React, { Component } from 'react';
-import {
-  Animated,
-  Easing,
-  View,
-  NativeModules,
-  Modal,
-  StatusBar,
-  Platform,
-  I18nManager,
-} from 'react-native';
+import { Animated, Easing, View, NativeModules, Modal, StatusBar, Platform, I18nManager } from 'react-native';
 import Tooltip from './Tooltip';
 import StepNumber from './StepNumber';
 import styles, { MARGIN, ARROW_SIZE, STEP_NUMBER_DIAMETER, STEP_NUMBER_RADIUS } from './style';
+import { setWizardState } from '../../globals/utils';
+import { setCurrentWizardStep } from '../../globals/Constants';
+import NavigatorService from '../../services/NavigatorService';
 
 type Props = {
   stop: () => void,
@@ -27,10 +21,10 @@ type Props = {
   animationDuration: ?number,
   tooltipComponent: ?React$Component,
   stepNumberComponent: ?React$Component,
-  overlay: 'svg' | 'view',
+  overlay: 'view',
   animated: boolean,
   androidStatusBarVisible: boolean,
-  backdropColor: string
+  backdropColor: string,
 };
 
 type State = {
@@ -84,21 +78,26 @@ class CopilotModal extends Component<Props, State> {
   layout = {
     width: 0,
     height: 0,
-  }
+  };
 
   handleLayoutChange = ({ nativeEvent: { layout } }) => {
     this.layout = layout;
-  }
+  };
 
   measure(): Promise {
-    if (typeof __TEST__ !== 'undefined' && __TEST__) { // eslint-disable-line no-undef
-      return new Promise(resolve => resolve({
-        x: 0, y: 0, width: 0, height: 0,
-      }));
+    if (typeof __TEST__ !== 'undefined' && __TEST__) {
+      // eslint-disable-line no-undef
+      return new Promise(resolve =>
+        resolve({
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+        })
+      );
     }
 
-
-    return new Promise((resolve) => {
+    return new Promise(resolve => {
       const setLayout = () => {
         if (this.layout.width !== 0) {
           resolve(this.layout);
@@ -111,17 +110,19 @@ class CopilotModal extends Component<Props, State> {
   }
 
   async _animateMove(obj = {}): void {
-    const layout = await this.measure();
-    obj.left = obj.left % Dimensions.get('window').width
-    obj.top = obj.top % Dimensions.get('window').height
-    console.log({obj})
+    let layout;
+    try {
+      layout = await this.measure();
+    } catch (error) {
+      //console.log({error});
+    }
     if (!this.props.androidStatusBarVisible && Platform.OS === 'android') {
       obj.top -= StatusBar.currentHeight; // eslint-disable-line no-param-reassign
     }
 
     let stepNumberLeft;
 
-    const edgeCase = (stepLeft) => {
+    const edgeCase = stepLeft => {
       if (stepLeft > layout.width - STEP_NUMBER_DIAMETER) {
         return layout.width - STEP_NUMBER_DIAMETER;
       }
@@ -132,21 +133,20 @@ class CopilotModal extends Component<Props, State> {
       stepNumberLeft = obj.left - STEP_NUMBER_RADIUS;
 
       if (stepNumberLeft < 0) {
-        stepNumberLeft = (obj.left + obj.width) - STEP_NUMBER_RADIUS;
+        stepNumberLeft = obj.left + obj.width - STEP_NUMBER_RADIUS;
         stepNumberLeft = edgeCase(stepNumberLeft);
       }
     } else {
-      stepNumberLeft = (obj.left + obj.width) - STEP_NUMBER_RADIUS;
+      stepNumberLeft = obj.left + obj.width - STEP_NUMBER_RADIUS;
       if (stepNumberLeft > layout.width) {
         stepNumberLeft = obj.left - STEP_NUMBER_RADIUS;
         stepNumberLeft = edgeCase(stepNumberLeft);
       }
     }
 
-
     const center = {
-      x: obj.left + (obj.width / 2),
-      y: obj.top + (obj.height / 2),
+      x: obj.left + obj.width / 2,
+      y: obj.top + obj.height / 2,
     };
 
     const relativeToLeft = center.x;
@@ -163,11 +163,11 @@ class CopilotModal extends Component<Props, State> {
     if (verticalPosition === 'bottom') {
       tooltip.top = obj.top + obj.height + MARGIN;
       arrow.borderBottomColor = '#fff';
-      arrow.top = tooltip.top - (ARROW_SIZE * 2);
+      arrow.top = tooltip.top - ARROW_SIZE * 2;
     } else {
       tooltip.bottom = layout.height - (obj.top - MARGIN);
       arrow.borderTopColor = '#fff';
-      arrow.bottom = tooltip.bottom - (ARROW_SIZE * 2);
+      arrow.bottom = tooltip.bottom - ARROW_SIZE * 2;
     }
 
     if (horizontalPosition === 'left') {
@@ -188,16 +188,17 @@ class CopilotModal extends Component<Props, State> {
     };
 
     if (this.state.animated) {
-      Animated
-        .parallel(Object.keys(animate)
-          .map(key => Animated.timing(this.state.animatedValues[key], {
+      Animated.parallel(
+        Object.keys(animate).map(key =>
+          Animated.timing(this.state.animatedValues[key], {
             toValue: animate[key],
             duration: this.props.animationDuration,
             easing: this.props.easing,
-          })))
-        .start();
+          })
+        )
+      ).start();
     } else {
-      Object.keys(animate).forEach((key) => {
+      Object.keys(animate).forEach(key => {
         this.state.animatedValues[key].setValue(animate[key]);
       });
     }
@@ -216,19 +217,19 @@ class CopilotModal extends Component<Props, State> {
         y: Math.floor(Math.max(obj.top, 0)),
       },
     });
-
-    console.log({last:obj})
-
   }
 
   animateMove(obj = {}): void {
-    return new Promise((resolve) => {
-      this.setState(
-        { containerVisible: true },
-        () => requestAnimationFrame(async () => {
-          await this._animateMove(obj);
+    return new Promise(resolve => {
+      this.setState({ containerVisible: true }, () =>
+        requestAnimationFrame(async () => {
+          try {
+            await this._animateMove(obj);
+          } catch (error) {
+            //console.log({error})
+          }
           resolve();
-        }),
+        })
       );
     });
   }
@@ -243,22 +244,22 @@ class CopilotModal extends Component<Props, State> {
 
   handleNext = () => {
     this.props.next();
-  }
+  };
 
   handlePrev = () => {
     this.props.prev();
-  }
+  };
 
   handleStop = () => {
-    this.reset();
     this.props.stop();
-  }
+    this.reset();
+    setCurrentWizardStep('100');
+    // NavigatorService.reset('ServiceProviderDashPage');
+  };
 
   renderMask() {
     /* eslint-disable global-require */
-    const MaskComponent = this.props.overlay === 'svg'
-      ? require('./SvgMask').default
-      : require('./ViewMask').default;
+    const MaskComponent = require('./ViewMask').default;
     /* eslint-enable */
     return (
       <MaskComponent
@@ -270,15 +271,13 @@ class CopilotModal extends Component<Props, State> {
         easing={this.props.easing}
         animationDuration={this.props.animationDuration}
         backdropColor={this.props.backdropColor}
+        mask={this.props.mask}
       />
     );
   }
 
   renderTooltip() {
-    const {
-      tooltipComponent: TooltipComponent,
-      stepNumberComponent: StepNumberComponent,
-    } = this.props;
+    const { tooltipComponent: TooltipComponent, stepNumberComponent: StepNumberComponent } = this.props;
 
     return [
       <Animated.View
@@ -304,6 +303,7 @@ class CopilotModal extends Component<Props, State> {
           isFirstStep={this.props.isFirstStep}
           isLastStep={this.props.isLastStep}
           currentStep={this.props.currentStep}
+          isNext={this.props.isNext}
           handleNext={this.handleNext}
           handlePrev={this.handlePrev}
           handleStop={this.handleStop}
@@ -315,7 +315,6 @@ class CopilotModal extends Component<Props, State> {
   render() {
     const containerVisible = this.state.containerVisible || this.props.visible;
     const contentVisible = this.state.layout && containerVisible;
-
     return (
       <Modal
         animationType="none"
@@ -324,10 +323,7 @@ class CopilotModal extends Component<Props, State> {
         transparent
         supportedOrientations={['portrait', 'landscape']}
       >
-        <View
-          style={styles.container}
-          onLayout={this.handleLayoutChange}
-        >
+        <View style={styles.container} onLayout={this.handleLayoutChange}>
           {contentVisible && this.renderMask()}
           {contentVisible && this.renderTooltip()}
         </View>

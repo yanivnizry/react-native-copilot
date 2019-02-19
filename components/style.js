@@ -30,9 +30,7 @@ export default StyleSheet.create({
     borderRadius: 3,
     overflow: 'hidden',
   },
-  tooltipText: {
-
-  },
+  tooltipText: {},
   tooltipContainer: {
     flex: 1,
   },

@@ -4,16 +4,18 @@ import { Animated } from 'react-native';
 import { Path } from 'react-native-svg';
 
 class SvgPathWrap extends Component {
-  setNativeProps = (props) => {
+  setNativeProps = props => {
     if (this._component) {
       this._component.setNativeProps(props);
     }
-  }
+  };
 
   render() {
     return (
       <Path
-        ref={(component) => { this._component = component; }}
+        ref={component => {
+          this._component = component;
+        }}
         {...this.props}
       />
     );

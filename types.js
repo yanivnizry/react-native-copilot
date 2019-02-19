@@ -8,10 +8,10 @@ export type Step = {
 };
 
 export type CopilotContext = {
-  registerStep: (Step) => void,
+  registerStep: Step => void,
   unregisterStep: (name: string) => void,
   getCurrentStep: () => Step,
-}
+};
 
 export type valueXY = {
   x: number,

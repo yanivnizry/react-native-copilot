@@ -8,26 +8,12 @@ const WalkthroughableText = walkthroughable(Text);
 const WalkthroughableScrollView = walkthroughable(ScrollView);
 const WalkthroughableTextInput = walkthroughable(TextInput);
 
-const walkthroughableComponents = [
-  WalkthroughableView,
-  WalkthroughableText,
-  WalkthroughableScrollView,
-  WalkthroughableTextInput,
-];
+const walkthroughableComponents = [WalkthroughableView, WalkthroughableText, WalkthroughableScrollView, WalkthroughableTextInput];
 
-const nativeComponents = [
-  View,
-  Text,
-  ScrollView,
-  TextInput,
-];
+const nativeComponents = [View, Text, ScrollView, TextInput];
 
 it('spreads the copilot prop object on the wrapped component', () => {
-  const tree = renderer.create(
-    <WalkthroughableView
-      copilot={{ keyForNum: 1, keyForStr: 'hello' }}
-    />,
-  );
+  const tree = renderer.create(<WalkthroughableView copilot={{ keyForNum: 1, keyForStr: 'hello' }} />);
 
   const { props } = tree.root.findByType(View);
 
@@ -36,12 +22,7 @@ it('spreads the copilot prop object on the wrapped component', () => {
 });
 
 it('spreads the copilot prop object on the wrapped component along with other flat props', () => {
-  const tree = renderer.create(
-    <WalkthroughableView
-      copilot={{ keyForNum: 1, keyForStr: 'hello' }}
-      otherProp="the other prop"
-    />,
-  );
+  const tree = renderer.create(<WalkthroughableView copilot={{ keyForNum: 1, keyForStr: 'hello' }} otherProp="the other prop" />);
 
   const { props } = tree.root.findByType(View);
 
@@ -51,12 +32,7 @@ it('spreads the copilot prop object on the wrapped component along with other fl
 });
 
 it('spreads the copilot prop object on the wrapped component not overriding the root props', () => {
-  const tree = renderer.create(
-    <WalkthroughableView
-      copilot={{ keyForNum: 1, keyForStr: 'hello' }}
-      keyForNum={2}
-    />,
-  );
+  const tree = renderer.create(<WalkthroughableView copilot={{ keyForNum: 1, keyForStr: 'hello' }} keyForNum={2} />);
 
   const { props } = tree.root.findByType(View);
 
@@ -68,11 +44,7 @@ it('works with all types of react native built-in components', () => {
   nativeComponents.forEach((Component, key) => {
     const WalkthroughableComponent = walkthroughableComponents[key];
 
-    const tree = renderer.create(
-      <WalkthroughableComponent
-        copilot={{ keyForNum: 1, keyForStr: 'hello' }}
-      />,
-    );
+    const tree = renderer.create(<WalkthroughableComponent copilot={{ keyForNum: 1, keyForStr: 'hello' }} />);
 
     const { props } = tree.root.findByType(Component);
 
